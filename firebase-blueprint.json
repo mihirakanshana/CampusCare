@@ -1,0 +1,346 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "University student or administrator account profile.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "studentId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 40
+        },
+        "role": {
+          "type": "string",
+          "enum": ["student", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "fullName", "email", "studentId", "role", "createdAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator authorization record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "grantedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "grantedAt"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Campus maintenance or safety issue report submitted by a student.",
+      "type": "object",
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 180
+        },
+        "description": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 4000
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Electrical",
+            "Plumbing",
+            "Internet / Wi-Fi",
+            "Furniture",
+            "Cleaning",
+            "Laboratory Equipment",
+            "Infrastructure",
+            "Safety",
+            "Other"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "building": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "roomNumber": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 60
+        },
+        "additionalInfo": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        },
+        "imageUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1500
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["Low", "Medium", "High", "Urgent"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "Under Review", "In Progress", "Resolved"]
+        },
+        "studentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "studentName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "studentUniversityId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 40
+        },
+        "assignedDepartment": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "assignedStaff": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "aiAnalysis": {
+          "type": "object",
+          "properties": {}
+        },
+        "adminComments": {
+          "type": "array"
+        },
+        "statusHistory": {
+          "type": "array"
+        },
+        "isDemo": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "reportId",
+        "title",
+        "description",
+        "category",
+        "location",
+        "building",
+        "priority",
+        "status",
+        "studentId",
+        "studentName",
+        "isDemo",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notification delivered to a specific student or admin.",
+      "type": "object",
+      "properties": {
+        "notificationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "reportId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "type": {
+          "type": "string",
+          "enum": ["submitted", "status_change", "comment", "assignment", "system"]
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["notificationId", "userId", "reportId", "message", "isRead", "createdAt"]
+    },
+    "Department": {
+      "title": "Department",
+      "description": "University maintenance or facilities department.",
+      "type": "object",
+      "properties": {
+        "departmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "departmentName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["departmentId", "departmentName", "description", "createdAt"]
+    },
+    "StaffMember": {
+      "title": "StaffMember",
+      "description": "Campus maintenance technician or department staff member.",
+      "type": "object",
+      "properties": {
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 200
+        },
+        "departmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "departmentName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "availability": {
+          "type": "string",
+          "enum": ["Available", "Busy", "Off Duty"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["staffId", "fullName", "email", "departmentId", "availability", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile documents containing student/admin role and university ID."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Trusted administrator lookup documents."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Campus issue reports submitted by students and managed by admins."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "In-app notifications per user."
+    },
+    "/departments/{departmentId}": {
+      "schema": { "$ref": "#/entities/Department" },
+      "description": "Campus maintenance departments."
+    },
+    "/staff/{staffId}": {
+      "schema": { "$ref": "#/entities/StaffMember" },
+      "description": "Maintenance staff roster and availability."
+    }
+  }
+}
