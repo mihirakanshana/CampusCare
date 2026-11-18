@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Report a Community Issue | CampusCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --ink: #111827;
+      --text: #374151;
+      --muted: #6b7280;
+      --placeholder: #9ca3af;
+      --line: #d1d5db;
+      --line-soft: #e5e7eb;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --danger: #dc2626;
+      --success: #059669;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 6vw;
+      background: #fff;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-links { display: flex; gap: 26px; font-size: 0.95rem; font-weight: 500; }
+    .nav-links a { color: var(--muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a.active { color: var(--primary); font-weight: 600; }
+
+    /* Page */
+    .page { max-width: 800px; margin: 0 auto; padding: 44px 20px 70px; }
+    .page-header { text-align: center; margin-bottom: 40px; }
+    .page-header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(1.7rem, 4vw, 2.2rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .page-header p { margin: 0; font-size: 1.1rem; color: var(--muted); }
+
+    .card {
+      padding: 34px;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 10px 30px rgba(17,24,39,.05);
+    }
+
+    /* Fields */
+    .field { margin-bottom: 28px; }
+    .field > label, .field-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 15px 18px;
+      font: inherit;
+      font-size: 1rem;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    select { cursor: pointer; font-weight: 500; }
+    textarea { min-height: 130px; resize: vertical; }
+    ::placeholder { color: var(--placeholder); }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    }
+    .field.has-error input, .field.has-error select, .field.has-error textarea { border-color: var(--danger); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+    .error-text { margin: 8px 0 0; font-size: 0.85rem; color: var(--danger); display: none; }
+    .field.has-error .error-text { display: block; }
+    .counter { margin-top: 6px; font-size: 0.78rem; text-align: right; color: var(--muted); }
+
+    /* Location */
+    .loc-buttons { display: flex; flex-wrap: wrap; gap: 14px; }
+    .loc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .loc-btn:hover { background: #f3f4f6; }
+    .loc-btn.active { color: var(--primary); background: var(--primary-soft); border-color: var(--primary); }
+    .loc-btn:disabled { opacity: .6; cursor: wait; }
+    .loc-extra { margin-top: 14px; }
+    .loc-status {
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--success);
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+    }
+    .loc-status.info { color: var(--primary); background: var(--primary-soft); border-color: #bfdbfe; }
+    .hidden { display: none !important; }
+
+    /* Upload */
+    .dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px dashed var(--line);
+      border-radius: 12px;
+      transition: background .2s, border-color .2s;
+    }
+    .dropzone:hover, .dropzone.drag { background: var(--primary-soft); border-color: var(--primary); }
+    .dropzone .icon { font-size: 1.7rem; }
+    .dropzone strong { color: var(--primary); }
+    .dropzone small { color: var(--muted); }
+    .dropzone input { display: none; }
+    .preview { position: relative; display: inline-block; }
+    .preview img { display: block; max-width: 100%; max-height: 240px; border-radius: 12px; border: 1px solid var(--line-soft); }
+    .preview button {
+      position: absolute; top: 8px; right: 8px;
+      width: 30px; height: 30px;
+      border: none; border-radius: 50%;
+      background: rgba(17,24,39,.85); color: #fff; cursor: pointer;
+    }
+    .preview button:hover { background: var(--danger); }
+
+    /* Submit */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 22px;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-primary:active:not(:disabled) { transform: scale(.99); }
+    .btn-primary:disabled { opacity: .7; cursor: not-allowed; }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 3px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-error {
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      color: var(--danger);
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+    }
+
+    /* Success / confirmation */
+    .success { padding: 56px 34px; text-align: center; }
+    .success .check {
+      display: grid; place-items: center;
+      width: 80px; height: 80px;
+      margin: 0 auto 20px;
+      font-size: 2.3rem; color: #fff;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pop .4s ease;
+    }
+    @keyframes pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .success h2 { margin: 0 0 8px; font-size: 1.6rem; color: var(--ink); }
+    .success > p { max-width: 400px; margin: 0 auto 26px; color: var(--muted); }
+    .success .btn-primary { width: auto; }
+
+    .receipt {
+      max-width: 460px;
+      margin: 0 auto 26px;
+      padding: 6px 20px;
+      text-align: left;
+      background: #f9fafb;
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+    }
+    .receipt-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .receipt-row:last-child { border-bottom: none; }
+    .receipt dt { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+    .receipt dd { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 600; color: var(--ink); text-align: right; }
+    .receipt code {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.95rem;
+      letter-spacing: .03em;
+      color: var(--primary);
+    }
+    .copy-btn {
+      padding: 4px 10px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+    .badge-pending {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #92400e;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: 999px;
+    }
+    .warn {
+      max-width: 460px;
+      padding: 10px 14px;
+      margin: -10px auto 22px;
+      font-size: 0.88rem;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 22px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: #fff;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    @media (max-width: 700px) { .nav-links { display: none; } }
+    @media (max-width: 600px) {
+      .card { padding: 24px 18px; }
+      .grid-2 { grid-template-columns: 1fr; gap: 0; }
+      .loc-btn { width: 100%; justify-content: center; }
+      .receipt-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .receipt dd { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="#"><span class="brand-mark">♥</span> CampusCare</a>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#" class="active">Report Issue</a>
+      <a href="#">My Reports</a>
+      <a href="#">Help</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <header class="page-header">
+      <h1>Report a Community Issue</h1>
+      <p>Help make your community better by reporting issues that need attention.</p>
+    </header>
+
+    <!-- Confirmation view -->
+    <section id="success" class="card success hidden" aria-live="polite">
+      <div class="check">✓</div>
+      <h2>Report submitted successfully.</h2>
+      <p>Thank you for helping improve our campus. Keep your Report ID so you can refer to this issue later.</p>
+
+      <dl class="receipt">
+        <div class="receipt-row">
+          <dt>Report ID</dt>
+          <dd><code id="c-id"></code><button type="button" class="copy-btn" id="copy">Copy</button></dd>
+        </div>
+        <div class="receipt-row">
+          <dt>Submitted category</dt>
+          <dd id="c-category"></dd>
+        </div>
+        <div class="receipt-row">
+          <dt>Current status</dt>
+          <dd><span class="badge-pending" id="c-status">Pending</span></dd>
+        </div>
+      </dl>
+
+      <p id="c-warn" class="warn hidden">Your report was saved, but the photo couldn't be uploaded.</p>
+
+      <button type="button" id="again" class="btn-primary">Submit another report</button>
+    </section>
+
+    <!-- Form -->
+    <form id="form" class="card" novalidate>
+      <div class="field" id="f-title">
+        <label for="title">Issue Title *</label>
+        <input id="title" name="title" type="text" maxlength="120" placeholder="Brief description of the issue" />
+        <p class="error-text"></p>
+      </div>
+
+      <div class="field" id="f-description">
+        <label for="description">Detailed Description *</label>
+        <textarea id="description" name="description" maxlength="500"
+          placeholder="Provide more details about the issue, including when you noticed it and any relevant context"></textarea>
+        <div class="counter"><span id="count">0</span>/500</div>
+        <p class="error-text"></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="field" id="f-category">
+          <label for="category">Issue Category *</label>
+          <select id="category" name="category">
+            <option value="">Select a category</option>
+            <option>Electrical</option>
+            <option>Plumbing</option>
+            <option>Internet / Wi-Fi</option>
+            <option>Furniture</option>
+            <option>Cleaning</option>
+            <option>Laboratory</option>
+            <option>Safety</option>
+            <option>Other</option>
+          </select>
+          <p class="error-text"></p>
+        </div>
+
+        <div class="field">
+          <label for="urgency">Urgency Level *</label>
+          <select id="urgency" name="urgency">
+            <option>Low Priority</option>
+            <option selected>Medium Priority</option>
+            <option>High Priority</option>
+            <option>Urgent</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="f-location">
+        <span class="field-label">Location *</span>
+        <div class="loc-buttons">
+          <button type="button" class="loc-btn" id="btn-gps"><span>📍</span> <span id="gps-label">Get Current Location</span></button>
+          <button type="button" class="loc-btn" id="btn-manual"><span>⌄</span> Enter Manually</button>
+        </div>
+        <div class="loc-extra">
+          <div id="loc-ok" class="loc-status hidden"></div>
+          <div id="loc-wait" class="loc-status info hidden">Getting your location. Please allow access if prompted.</div>
+          <input id="location" name="location" type="text" maxlength="200" class="hidden"
+            placeholder="e.g. Block B, Room 204, near the main gate" />
+          <p class="error-text"></p>
+        </div>
+      </div>
+
+      <div class="field" id="f-image">
+        <span class="field-label">Upload Image (optional)</span>
+        <label class="dropzone" id="dropzone">
+          <span class="icon">📷</span>
+          <span><strong>Click to upload</strong> or drag and drop</span>
+          <small>PNG, JPG or GIF up to 5MB</small>
+          <input type="file" id="image" accept="image/*" />
+        </label>
+        <div class="preview hidden" id="preview">
+          <img id="preview-img" alt="Preview of uploaded issue" />
+          <button type="button" id="remove-img" aria-label="Remove image">✕</button>
+        </div>
+        <p class="error-text"></p>
+      </div>
+
+      <div id="form-error" class="form-error hidden" role="alert"></div>
+
+      <button type="submit" class="btn-primary" id="submit">Submit Report</button>
+    </form>
+  </main>
+
+  <footer class="footer">© <span id="year"></span> CampusCare · Making our campus better together</footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    /* =====================================================
+       1. PASTE YOUR FIREBASE CONFIG HERE
+       Firebase console > Project settings > Your apps > Web app
+       ===================================================== */
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const $ = (id) => document.getElementById(id);
+    const MAX_IMAGE = 5 * 1024 * 1024;
+
+    let locMode = null;   // null | "gps" | "manual"
+    let coords = null;
+    let imageFile = null;
+    let previewUrl = null;
+    let lastReportId = "";
+
+    $("year").textContent = new Date().getFullYear();
+
+    /* ---------- Unique report ID, e.g. CC-20261118-7KQ2MX ---------- */
+    function generateReportId() {
+      const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+      const bytes = new Uint32Array(6);
+      crypto.getRandomValues(bytes);
+      const suffix = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+      const d = new Date();
+      const date = d.getFullYear() +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        String(d.getDate()).padStart(2, "0");
+      return "CC-" + date + "-" + suffix;
+    }
+
+    /* ---------- Error helpers ---------- */
+    function setError(name, msg) {
+      const wrap = $("f-" + name);
+      wrap.classList.toggle("has-error", !!msg);
+      wrap.querySelector(".error-text").textContent = msg || "";
+    }
+    function clearErrors() {
+      ["title", "description", "category", "location", "image"].forEach((n) => setError(n, ""));
+      $("form-error").classList.add("hidden");
+    }
+    function showFormError(msg) {
+      $("form-error").textContent = msg;
+      $("form-error").classList.remove("hidden");
+    }
+
+    ["title", "description", "category"].forEach((n) =>
+      $(n).addEventListener("input", () => setError(n, ""))
+    );
+    $("location").addEventListener("input", () => setError("location", ""));
+    $("description").addEventListener("input", (e) => {
+      $("count").textContent = e.target.value.length;
+    });
+
+    /* ---------- Location ---------- */
+    function setLocMode(mode) {
+      locMode = mode;
+      $("btn-gps").classList.toggle("active", mode === "gps");
+      $("btn-manual").classList.toggle("active", mode === "manual");
+      $("location").classList.toggle("hidden", mode !== "manual");
+      if (mode !== "gps") {
+        $("loc-ok").classList.add("hidden");
+        $("loc-wait").classList.add("hidden");
+      }
+      setError("location", "");
+    }
+
+    $("btn-manual").addEventListener("click", () => {
+      coords = null;
+      setLocMode("manual");
+      $("location").focus();
+    });
+
+    $("btn-gps").addEventListener("click", () => {
+      setLocMode("gps");
+      if (!navigator.geolocation) {
+        setError("location", "Location is not supported by your browser");
+        return;
+      }
+      $("btn-gps").disabled = true;
+      $("gps-label").textContent = "Locating...";
+      $("loc-wait").classList.remove("hidden");
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          coords = {
+            lat: pos.coords.latitude.toFixed(6),
+            lng: pos.coords.longitude.toFixed(6),
+          };
+          $("loc-wait").classList.add("hidden");
+          $("loc-ok").textContent = "✓ Location captured: " + coords.lat + ", " + coords.lng;
+          $("loc-ok").classList.remove("hidden");
+          $("btn-gps").disabled = false;
+          $("gps-label").textContent = "Get Current Location";
+        },
+        () => {
+          coords = null;
+          $("loc-wait").classList.add("hidden");
+          $("btn-gps").disabled = false;
+          $("gps-label").textContent = "Get Current Location";
+          setError("location", "Could not get your location. Try entering it manually.");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+
+    /* ---------- Image ---------- */
+    function processFile(file) {
+      if (!file) return;
+      if (!file.type.startsWith("image/")) return setError("image", "Please choose an image file");
+      if (file.size > MAX_IMAGE) return setError("image", "Image must be under 5MB");
+
+      setError("image", "");
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      imageFile = file;
+      previewUrl = URL.createObjectURL(file);
+      $("preview-img").src = previewUrl;
+      $("preview").classList.remove("hidden");
+      $("dropzone").classList.add("hidden");
+    }
+
+    function removeImage() {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      imageFile = null;
+      previewUrl = null;
+      $("image").value = "";
+      $("preview").classList.add("hidden");
+      $("dropzone").classList.remove("hidden");
+    }
+
+    $("image").addEventListener("change", (e) => processFile(e.target.files[0]));
+    $("remove-img").addEventListener("click", removeImage);
+    $("dropzone").addEventListener("dragover", (e) => {
+      e.preventDefault();
+      $("dropzone").classList.add("drag");
+    });
+    $("dropzone").addEventListener("dragleave", () => $("dropzone").classList.remove("drag"));
+    $("dropzone").addEventListener("drop", (e) => {
+      e.preventDefault();
+      $("dropzone").classList.remove("drag");
+      processFile(e.dataTransfer.files[0]);
+    });
+
+    /* ---------- Validation ---------- */
+    function validate() {
+      let ok = true;
+      const fail = (name, msg) => { setError(name, msg); ok = false; };
+
+      if (!$("title").value.trim()) fail("title", "Title is required");
+      if ($("description").value.trim().length < 10)
+        fail("description", "Please describe the problem (min 10 characters)");
+      if (!$("category").value) fail("category", "Please select a category");
+
+      if (locMode === "gps") {
+        if (!coords) fail("location", "Waiting for your current location");
+      } else if (locMode === "manual") {
+        if (!$("location").value.trim()) fail("location", "Please enter a location");
+      } else {
+        fail("location", "Please choose how to provide the location");
+      }
+      return ok;
+    }
+
+    /* ---------- Submit to Firebase ---------- */
+    $("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearErrors();
+      if (!validate()) return;
+
+      if (firebaseConfig.apiKey.startsWith("YOUR_")) {
+        showFormError("Firebase isn't set up yet. Paste your Firebase config into the script at the bottom of this file.");
+        return;
+      }
+
+      const btn = $("submit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+      const reportId = generateReportId();
+      const category = $("category").value;
+      const isGps = locMode === "gps";
+      let imageUrl = null;
+      let imageFailed = false;
+
+      try {
+        // 1. Upload the photo (optional). A failed upload shouldn't lose the report.
+        if (imageFile) {
+          try {
+            const safeName = imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const fileRef = ref(storage, "reports/" + reportId + "/" + safeName);
+            await uploadBytes(fileRef, imageFile);
+            imageUrl = await getDownloadURL(fileRef);
+          } catch (uploadErr) {
+            console.error("Image upload failed:", uploadErr);
+            imageFailed = true;
+          }
+        }
+
+        // 2. Save the report. The document ID is the unique Report ID.
+        await setDoc(doc(db, "reports", reportId), {
+          reportId,
+          title: $("title").value.trim(),
+          description: $("description").value.trim(),
+          category,
+          urgency: $("urgency").value,
+          location: isGps ? coords.lat + ", " + coords.lng : $("location").value.trim(),
+          locationType: isGps ? "gps" : "manual",
+          coordinates: isGps
+            ? { latitude: Number(coords.lat), longitude: Number(coords.lng) }
+            : null,
+          imageUrl,
+          status: "Pending",
+          createdAt: serverTimestamp(),
+        });
+
+        // 3. Show the confirmation
+        lastReportId = reportId;
+        $("c-id").textContent = reportId;
+        $("c-category").textContent = category;
+        $("c-status").textContent = "Pending";
+        $("c-warn").classList.toggle("hidden", !imageFailed);
+        $("copy").textContent = "Copy";
+
+        $("form").classList.add("hidden");
+        $("success").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (err) {
+        console.error("Submit failed:", err);
+        showFormError("We couldn't submit your report. Please check your connection and try again.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Submit Report";
+      }
+    });
+
+    /* ---------- Confirmation actions ---------- */
+    $("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(lastReportId);
+        $("copy").textContent = "Copied ✓";
+        setTimeout(() => ($("copy").textContent = "Copy"), 2000);
+      } catch {
+        /* clipboard not available, ignore */
+      }
+    });
+
+    $("again").addEventListener("click", () => {
+      $("form").reset();
+      $("count").textContent = "0";
+      coords = null;
+      setLocMode(null);
+      removeImage();
+      clearErrors();
+      $("success").classList.add("hidden");
+      $("form").classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
