@@ -1,6 +1,0 @@
-{
-  "name": "CampusCare AI",
-  "description": "Smart Campus Issue Reporting & Management System powered by Gemini AI and Firebase.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
