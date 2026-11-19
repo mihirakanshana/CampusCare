@@ -1,0 +1,296 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Global Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && (
+          request.auth.token.email == 'mihirakanshana@gmail.com'
+          || request.auth.token.email == 'nimalperera@gmail.com'
+        );
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin()
+        || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    // --- Validation Blueprints ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'fullName', 'email', 'studentId', 'role', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'fullName', 'email', 'studentId', 'role', 'createdAt'])
+        && data.uid is string && isValidId(data.uid)
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && data.studentId is string && data.studentId.size() <= 40
+        && data.role in ['student', 'admin']
+        && data.createdAt is timestamp;
+    }
+
+    function isValidAdminRecord(data) {
+      return data.keys().hasAll(['uid', 'email', 'grantedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'fullName', 'grantedAt'])
+        && data.uid is string && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && (!('fullName' in data) || (data.fullName is string && data.fullName.size() <= 120))
+        && data.grantedAt is timestamp;
+    }
+
+    function isValidReport(data) {
+      return data.keys().hasAll([
+          'reportId', 'title', 'description', 'category', 'location',
+          'building', 'priority', 'status', 'studentId', 'studentName',
+          'isDemo', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'reportId', 'title', 'description', 'category', 'location',
+          'building', 'roomNumber', 'additionalInfo', 'imageUrl', 'priority',
+          'status', 'studentId', 'studentName', 'studentUniversityId',
+          'assignedDepartment', 'assignedStaff', 'aiAnalysis', 'adminComments',
+          'statusHistory', 'isDemo', 'createdAt', 'updatedAt', 'resolvedAt'
+        ])
+        && data.reportId is string && isValidId(data.reportId)
+        && data.title is string && data.title.size() >= 3 && data.title.size() <= 180
+        && data.description is string && data.description.size() >= 5 && data.description.size() <= 4000
+        && data.category in [
+          'Electrical', 'Plumbing', 'Internet / Wi-Fi', 'Furniture',
+          'Cleaning', 'Laboratory Equipment', 'Infrastructure', 'Safety', 'Other'
+        ]
+        && data.location is string && data.location.size() >= 1 && data.location.size() <= 200
+        && data.building is string && data.building.size() >= 1 && data.building.size() <= 120
+        && (!('roomNumber' in data) || (data.roomNumber is string && data.roomNumber.size() <= 60))
+        && (!('additionalInfo' in data) || (data.additionalInfo is string && data.additionalInfo.size() <= 1000))
+        && (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1500))
+        && data.priority in ['Low', 'Medium', 'High', 'Urgent']
+        && data.status in ['Pending', 'Under Review', 'In Progress', 'Resolved']
+        && data.studentId is string && isValidId(data.studentId)
+        && data.studentName is string && data.studentName.size() >= 1 && data.studentName.size() <= 120
+        && (!('studentUniversityId' in data) || (data.studentUniversityId is string && data.studentUniversityId.size() <= 40))
+        && (!('assignedDepartment' in data) || (data.assignedDepartment is string && data.assignedDepartment.size() <= 120))
+        && (!('assignedStaff' in data) || (data.assignedStaff is string && data.assignedStaff.size() <= 120))
+        && (!('aiAnalysis' in data) || (data.aiAnalysis == null || data.aiAnalysis is map))
+        && (!('adminComments' in data) || (
+          data.adminComments is list
+          && data.adminComments.size() <= 50
+          && (data.adminComments.size() == 0 || data.adminComments[0] is map)
+        ))
+        && (!('statusHistory' in data) || (
+          data.statusHistory is list
+          && data.statusHistory.size() <= 10
+          && (data.statusHistory.size() == 0 || data.statusHistory[0] is map)
+        ))
+        && data.isDemo is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && (!('resolvedAt' in data) || (data.resolvedAt == null || data.resolvedAt is timestamp));
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['notificationId', 'userId', 'reportId', 'message', 'isRead', 'createdAt'])
+        && data.keys().hasOnly(['notificationId', 'userId', 'reportId', 'message', 'type', 'isRead', 'createdAt'])
+        && data.notificationId is string && isValidId(data.notificationId)
+        && data.userId is string && isValidId(data.userId)
+        && data.reportId is string && data.reportId.size() >= 1 && data.reportId.size() <= 64
+        && data.message is string && data.message.size() >= 1 && data.message.size() <= 500
+        && (!('type' in data) || data.type in ['submitted', 'status_change', 'comment', 'assignment', 'system'])
+        && data.isRead is bool
+        && data.createdAt is timestamp;
+    }
+
+    function isValidDepartment(data) {
+      return data.keys().hasAll(['departmentId', 'departmentName', 'description', 'createdAt'])
+        && data.keys().hasOnly(['departmentId', 'departmentName', 'description', 'createdAt'])
+        && data.departmentId is string && isValidId(data.departmentId)
+        && data.departmentName is string && data.departmentName.size() >= 1 && data.departmentName.size() <= 120
+        && data.description is string && data.description.size() <= 500
+        && data.createdAt is timestamp;
+    }
+
+    function isValidStaff(data) {
+      return data.keys().hasAll(['staffId', 'fullName', 'email', 'departmentId', 'availability', 'createdAt'])
+        && data.keys().hasOnly(['staffId', 'fullName', 'email', 'departmentId', 'departmentName', 'availability', 'createdAt'])
+        && data.staffId is string && isValidId(data.staffId)
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && data.departmentId is string && isValidId(data.departmentId)
+        && (!('departmentName' in data) || (data.departmentName is string && data.departmentName.size() <= 120))
+        && data.availability in ['Available', 'Busy', 'Off Duty']
+        && data.createdAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // Users (PII strict isolation: owner or admin only)
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().uid == userId
+        && incoming().createdAt == request.time
+        && (
+          (incoming().uid == request.auth.uid && incoming().role == 'student')
+          || isAdmin()
+        );
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            request.auth.uid == userId
+            && incoming().role == existing().role
+            && incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'studentId'])
+          )
+        );
+      allow delete: if isAdmin() && isValidId(userId);
+    }
+
+    // Admins Registry
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow create, update: if isAdmin()
+        && isValidId(adminId)
+        && isValidAdminRecord(incoming())
+        && incoming().uid == adminId
+        && incoming().grantedAt == request.time;
+      allow delete: if isAdmin() && isValidId(adminId);
+    }
+
+    // Reports
+    match /reports/{reportId} {
+      allow get: if isSignedIn() && isValidId(reportId) && (existing().studentId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && isValidId(reportId)
+        && isValidReport(incoming())
+        && incoming().reportId == reportId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin()
+          || (
+            incoming().studentId == request.auth.uid
+            && incoming().status == 'Pending'
+            && incoming().isDemo == false
+            && (!('assignedDepartment' in incoming()) || incoming().assignedDepartment == '')
+            && (!('assignedStaff' in incoming()) || incoming().assignedStaff == '')
+            && (!('adminComments' in incoming()) || incoming().adminComments.size() == 0)
+            && (!('resolvedAt' in incoming()) || incoming().resolvedAt == null)
+          )
+        );
+      allow update: if isSignedIn()
+        && isValidId(reportId)
+        && isValidReport(incoming())
+        && incoming().reportId == existing().reportId
+        && incoming().studentId == existing().studentId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin()
+          || (
+            request.auth.uid == existing().studentId
+            && existing().status != 'Resolved'
+            && incoming().status == existing().status
+            && incoming().priority == existing().priority
+            && incoming().isDemo == existing().isDemo
+            && incoming().diff(existing()).affectedKeys().hasOnly(['additionalInfo', 'updatedAt'])
+          )
+        );
+      allow delete: if isAdmin() && isValidId(reportId);
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn() && isValidId(notificationId) && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && isValidId(notificationId)
+        && isValidNotification(incoming())
+        && incoming().notificationId == notificationId
+        && incoming().createdAt == request.time
+        && (
+          isAdmin()
+          || (
+            incoming().userId == request.auth.uid
+            && incoming().isRead == false
+            && (!('type' in incoming()) || incoming().type == 'submitted')
+          )
+        );
+      allow update: if isSignedIn()
+        && isValidId(notificationId)
+        && isValidNotification(incoming())
+        && incoming().notificationId == existing().notificationId
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && (
+          isAdmin()
+          || (
+            request.auth.uid == existing().userId
+            && incoming().diff(existing()).affectedKeys().hasOnly(['isRead'])
+          )
+        );
+      allow delete: if isSignedIn() && isValidId(notificationId) && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Departments (non-PII catalog readable by signed-in users; managed by admins)
+    match /departments/{departmentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin()
+        && isValidId(departmentId)
+        && isValidDepartment(incoming())
+        && incoming().departmentId == departmentId
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(departmentId)
+        && isValidDepartment(incoming())
+        && incoming().departmentId == existing().departmentId
+        && incoming().createdAt == existing().createdAt;
+      allow delete: if isAdmin() && isValidId(departmentId);
+    }
+
+    // Staff (contains staff emails -> PII restricted strictly to admins)
+    match /staff/{staffId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin()
+        && isValidId(staffId)
+        && isValidStaff(incoming())
+        && incoming().staffId == staffId
+        && incoming().createdAt == request.time
+        && exists(/databases/$(database)/documents/departments/$(incoming().departmentId));
+      allow update: if isAdmin()
+        && isValidId(staffId)
+        && isValidStaff(incoming())
+        && incoming().staffId == existing().staffId
+        && incoming().createdAt == existing().createdAt
+        && exists(/databases/$(database)/documents/departments/$(incoming().departmentId));
+      allow delete: if isAdmin() && isValidId(staffId);
+    }
+  }
+}

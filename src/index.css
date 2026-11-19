@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --uf-forest: #064E3B;
+    --uf-emerald: #059669;
+    --uf-emerald-bright: #10B981;
+    --uf-mint-canvas: #F4FBF7;
+    --uf-ink: #0F172A;
+    --uf-muted: #52635D;
+  }
+
+  html {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+}
+
+.uf-ambient-canvas {
+  background-color: #F4FBF7;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.11) 0px, transparent 50%),
+    radial-gradient(at 95% 8%, rgba(20, 184, 166, 0.09) 0px, transparent 45%),
+    radial-gradient(at 50% 100%, rgba(209, 250, 229, 0.55) 0px, transparent 55%);
+  background-attachment: fixed;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(6, 78, 59, 0.09);
+  box-shadow:
+    0 10px 30px -14px rgba(6, 78, 59, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.glass-panel-hover {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(6, 78, 59, 0.09);
+  box-shadow:
+    0 10px 30px -14px rgba(6, 78, 59, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(5, 150, 105, 0.24);
+  box-shadow:
+    0 14px 34px -14px rgba(5, 150, 105, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-right: 1px solid rgba(6, 78, 59, 0.09);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(6, 78, 59, 0.08);
+}
+
+.glass-hero-emerald {
+  background: linear-gradient(135deg, #064E3B 0%, #047857 56%, #059669 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 16px 38px -16px rgba(6, 78, 59, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(6, 78, 59, 0.14);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
